@@ -16,57 +16,72 @@ class Solution:
 
     def output_paths(self):
 
-        def d(self,nodeList,parentdict):
-            min = -1
+        paths, bandwidths, priorities = {}, {}, {}
+        bandwidths.update(self.info["bandwidths"])
+
+        def d(nodeList,parentdict):
+            min_weight = -1
             min_node = -1
             min_parent = -1
+
             for node in nodeList:
-                parent = parentdict(node)
+
+                parent = parentdict[node]
                 parent_band = self.info["bandwidths"][parent]
                 node_band = self.info["bandwidths"][node]
-                if node_band+parent_band > min:
+
+                if (node in self.info["alphas"]):
+                    if node_band >= self.info["alphas"][node]:
+                        continue 
+
+                if (node_band + parent_band > min_weight):
                     min_node = node
-                    min = node_band+parent_band
+                    min_weight = node_band+parent_band
                     min_parent = parent
 
-            return min_node, min, min_parent
-        """
-        This method must be filled in by you. You may add other methods and subclasses as you see fit,
-        but they must remain within the Solution class.
-        """
-        paths, bandwidths, priorities = {}, {}, {}
-        # Note: You do not need to modify all of the above. For Problem 1, only the paths variable needs to be modified. If you do modify a variable you are not supposed to, you might notice different revenues outputted by the Driver locally since the autograder will ignore the variables not relevant for the problem.
-        # WARNING: DO NOT MODIFY THE LINE BELOW, OR BAD THINGS WILL HAPPEN
-
+                if (min_node == -1):
+                    return None
+                
+            return min_node, min_weight, min_parent
+        
         #print(highest_ban_parent_dict)
-        tovisit = []
-        initparentdict = {}
-        for i in self.graph[self.isp]:
-              tovisit.append(i)
-              parentdict[i] = self.isp
-              #node, node badwidth
+        #node, node badwidth
         for i in self.info["list_clients"]:
-            explored = [self.isp,-1]
+            tovisit = []
+            parentdict = {}
+            explored = [(self.isp,-1)]
+
+            for vertex in self.graph[self.isp]:
+              tovisit.append(vertex)
+              parentdict[vertex] = self.isp
             
-            parentdict = initparentdict
             #explored = node, parent
             currenttovisit = tovisit
-            while i not in explored:
+            while (i not in explored):
+                    #print(currenttovisit)
+                    #print(explored)
                     node_picked, bandpicked, parent = d(currenttovisit,parentdict)
-                    explored.append[node_picked,parent]
+                    if(node_picked is None):
+                        break
+                    explored.append((node_picked, parent))
                     for j in self.graph[node_picked]:
-                         if j not in tovisit:
-                              tovisit.append(j)
-                              parentdict[j] = node_picked
+                         if j not in currenttovisit:
+                              if(j not in explored[0]):
+                                currenttovisit.append(j)
+                                print('node_picked')
+                                print(node_picked)
+                                print(currenttovisit)
+                                parentdict[j] = node_picked
                     self.info["bandwidths"][node_picked] = bandpicked
+                    currenttovisit.remove(node_picked)
+                    print(currenttovisit)
 
             paths[i] = [i]
-            current = explored[-1][1]
+            current = explored[-1][0]
             while current != self.isp:
                  paths[i].append(current)
                  current = parentdict[current]
+            paths[i].reverse()
+            
         #paths = bfs_path(self.graph,self.isp,self.info["list_clients"])
         return (paths, bandwidths, priorities)
-
-    
-        
