@@ -39,7 +39,7 @@ class Solution:
                     min_weight = node_band+parent_band
                     min_parent = parent
 
-                if (min_node == -1):
+            if (min_node == -1):
                     return None
                 
             return min_node, min_weight, min_parent
@@ -49,7 +49,9 @@ class Solution:
         for i in self.info["list_clients"]:
             tovisit = []
             parentdict = {}
-            explored = [(self.isp,-1)]
+            explored_node = [(self.isp,-1)]
+            explored = []
+            explored.append(self.isp)
 
             for vertex in self.graph[self.isp]:
               tovisit.append(vertex)
@@ -57,27 +59,28 @@ class Solution:
             
             #explored = node, parent
             currenttovisit = tovisit
-            while (i not in explored):
+            while (i not in explored_node):
                     #print(currenttovisit)
                     #print(explored)
                     node_picked, bandpicked, parent = d(currenttovisit,parentdict)
                     if(node_picked is None):
                         break
-                    explored.append((node_picked, parent))
+                    explored_node.append((node_picked, parent))
+                    explored.append(node_picked)
                     for j in self.graph[node_picked]:
                          if j not in currenttovisit:
-                              if(j not in explored[0]):
+                              if(j not in explored and j not in explored_node[0]):
                                 currenttovisit.append(j)
-                                print('node_picked')
+                                #print('node_picked')
                                 print(node_picked)
-                                print(currenttovisit)
+                               #print(currenttovisit)
                                 parentdict[j] = node_picked
                     self.info["bandwidths"][node_picked] = bandpicked
                     currenttovisit.remove(node_picked)
-                    print(currenttovisit)
+                    #print(currenttovisit)
 
             paths[i] = [i]
-            current = explored[-1][0]
+            current = explored_node[-1][0]
             while current != self.isp:
                  paths[i].append(current)
                  current = parentdict[current]
