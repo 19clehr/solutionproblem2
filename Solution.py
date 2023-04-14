@@ -12,7 +12,6 @@ class Solution:
         self.graph = graph
         self.info = info
     
-    
 
     def output_paths(self):
 
@@ -20,9 +19,13 @@ class Solution:
         bandwidths.update(self.info["bandwidths"])
 
         def d(nodeList,parentdict):
-            min_weight = -1
-            min_node = -1
-            min_parent = -1
+
+            if len(nodeList) == 0:
+                return None
+
+            min_weight = self.info["bandwidths"][nodeList[0]]
+            min_node = nodeList[0]
+            min_parent = parentdict[nodeList[0]]
 
             for node in nodeList:
 
@@ -40,7 +43,11 @@ class Solution:
                     min_parent = parent
 
             if (min_node == -1):
-                    return None
+                return None
+            if (min_weight == -1):
+                return None
+            if (min_parent == -1):
+                return None
                 
             return min_node, min_weight, min_parent
         
@@ -62,9 +69,10 @@ class Solution:
             while (i not in explored_node):
                     #print(currenttovisit)
                     #print(explored)
-                    node_picked, bandpicked, parent = d(currenttovisit,parentdict)
-                    if(node_picked is None):
+                    holder = d(currenttovisit,parentdict)
+                    if(holder is None):
                         break
+                    node_picked, bandpicked, parent = holder
                     explored_node.append((node_picked, parent))
                     explored.append(node_picked)
                     for j in self.graph[node_picked]:
@@ -72,7 +80,7 @@ class Solution:
                               if(j not in explored and j not in explored_node[0]):
                                 currenttovisit.append(j)
                                 #print('node_picked')
-                                print(node_picked)
+                                #print(node_picked)
                                #print(currenttovisit)
                                 parentdict[j] = node_picked
                     self.info["bandwidths"][node_picked] = bandpicked
